@@ -37,17 +37,31 @@ router.post('/optimize', async (req, res) => {
     // Get company financials
     const [company, expenses, assets, taxComp] = await Promise.all([
       db('companies').where({ id: req.user.companyId }).first(),
-      db('expenses').where({ company_id: req.user.companyId }).where(db.raw('EXTRACT(YEAR FROM expense_date) = ?', [year])),
-      db('fixed_assets').where({ company_id: req.user.companyId, status: 'active' }),
+      db('expenses').where({ company_id: req.user.companyId }).whereRaw('EXTRACT(YEAR FROM expense_date) = ?', [year]),
+      db('fixed_assets').where({ company_id: req.user.companyId, status: 'active' }).whereRaw('EXTRACT(YEAR FROM acquisition_date) = ?', [year]),
       db('tax_computations').where({ company_id: req.user.companyId, year_of_assessment: year }).first(),
     ]);
 
+    const totalZakat = expenses.filter(e => e.category === 'zakat').reduce((s, e) => s + Number(e.amount), 0);
+    const totalEntertainment = expenses.filter(e => e.category === 'entertainment').reduce((s, e) => s + Number(e.amount), 0);
+    const totalAssets = assets.reduce((s, a) => s + Number(a.cost), 0);
+    const totalExp = expenses.reduce((s, e) => s + Number(e.amount), 0);
+    const totalRev = taxComp ? taxComp.gross_revenue : 0; // Use tax comp or 0 if not computed yet
+
+    const payload = {
+      revenue: parseFloat(totalRev),
+      expenses: parseFloat(totalExp),
+      is_sme: Boolean(company.is_sme),
+      assets_purchased: parseFloat(totalAssets),
+      zakat_paid: parseFloat(totalZakat),
+      entertainment_expenses: parseFloat(totalEntertainment)
+    };
+
     try {
-      const response = await axios.post(`${AI_SERVICE_URL}/optimize`, {
-        company, expenses, assets, tax_computation: taxComp, year,
-      }, { timeout: 5000 });
+      const response = await axios.post(`${AI_SERVICE_URL}/optimize`, payload, { timeout: 5000 });
       return res.json({ data: response.data });
     } catch (aiErr) {
+      console.error('Python AI optimize failed:', aiErr.response?.data || aiErr.message);
       // Fallback: built-in suggestions
       const suggestions = generateOptimizationSuggestions(company, expenses, assets, taxComp);
       return res.json({ data: suggestions, source: 'rule_based_fallback' });
@@ -60,42 +74,37 @@ router.post('/optimize', async (req, res) => {
 // POST /api/ai/predict - predict next year's tax
 router.post('/predict', async (req, res) => {
   try {
-    const currentYear = new Date().getFullYear();
+    const company = await db('companies').where({ id: req.user.companyId }).first();
     const computations = await db('tax_computations')
       .where({ company_id: req.user.companyId })
       .orderBy('year_of_assessment', 'asc')
-      .limit(3);
+      .limit(5);
 
     if (computations.length === 0) {
       return res.json({ data: { message: 'No historical data for prediction. Run tax computation first.' } });
     }
 
-    // Simple linear trend prediction
-    const latestYear = computations[computations.length - 1];
-    const growthRate = computations.length > 1
-      ? (latestYear.gross_revenue - computations[0].gross_revenue) / computations[0].gross_revenue / computations.length
-      : 0.10; // assume 10% growth if only one data point
+    const payload = {
+        historical_data: computations.map((c, idx) => ({
+            month: idx + 1, // Treat each historical year as a data point 
+            revenue: parseFloat(c.gross_revenue),
+            expenses: parseFloat(c.total_allowable_expenses)
+        })),
+        is_sme: Boolean(company.is_sme)
+    };
 
-    const predictedRevenue = latestYear.gross_revenue * (1 + growthRate);
-    const predictedExpenses = latestYear.total_allowable_expenses * (1 + growthRate * 0.8);
-    const predictedChargeable = Math.max(predictedRevenue - predictedExpenses - latestYear.total_capital_allowance, 0);
-
-    const { default: taxService } = await Promise.resolve({ default: require('../services/taxService') });
-    const citPredict = require('../services/taxService').calculateCIT(predictedChargeable, latestYear.is_sme);
-
-    res.json({
-      data: {
-        prediction_year: currentYear + 1,
-        based_on_years: computations.map((c) => c.year_of_assessment),
-        predicted_revenue: predictedRevenue,
-        predicted_expenses: predictedExpenses,
-        predicted_chargeable_income: predictedChargeable,
-        predicted_tax: citPredict.total_tax,
-        predicted_effective_rate: citPredict.effective_rate,
-        growth_rate_assumed: growthRate,
-        note: 'Prediction based on linear trend. Actual may vary.',
-      },
-    });
+    try {
+      const response = await axios.post(`${AI_SERVICE_URL}/predict`, payload, { timeout: 5000 });
+      return res.json({
+        data: {
+          prediction_year: new Date().getFullYear() + 1,
+          ...response.data
+        }
+      });
+    } catch (aiErr) {
+        console.error('Python AI predict failed:', aiErr.response?.data || aiErr.message);
+        return res.status(503).json({ error: 'AI prediction service unavailable' });
+    }
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

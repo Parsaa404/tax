@@ -1,5 +1,6 @@
 # Dependencies
 node_modules/
+venv/
 package-lock.json
 npm-debug.log
 yarn-error.log
@@ -26,3 +27,5 @@ yarn-error.log*
 # OS Files
 .DS_Store
 Thumbs.db
+
+

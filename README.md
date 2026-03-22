@@ -60,26 +60,45 @@ MYTax is a fully functional, end-to-end accounting and tax computation system de
 
 ## 🛠️ Setup Instructions
 ### 1. Prerequisites
-*   Node.js (v18+)
-*   PostgreSQL database (local or cloud, like Supabase)
+1.  **PostgreSQL** Database.
+2.  **Node.js** (v18+) for the backend API.
+3.  **Python 3.12+** for the AI Microservice.
 
-### 2. Backend Installation
+### 2. Database Setup
+```bash
+cd backend
+# Create a .env file based on the example (or set POSTGRES_URL directly)
+cp .env.example .env
+# Edit .env and verify database connection string
+npx knex migrate:latest
+npm run seed
+```
+
+### 3. Backend Setup
 ```bash
 cd backend
 npm install
-
-# Create a .env file based on the example (or set POSTGRES_URL directly)
-cp .env.example .env
-
-# Run database migrations and seed data
-npx knex migrate:latest
-npx knex seed:run
-
-# Start the backend server (runs on port 3000)
-npm run dev
+npm start
 ```
+The backend server runs on `http://localhost:3000`.
 
-### 3. Frontend Installation
+### 4. AI Service (Python Microservice) Setup
+The `ai-service` handles complex ML tasks (categorization, tax optimization, and linear regression prediction) using FastAPI and scikit-learn.
+
+```bash
+cd ai-service
+python -m venv venv
+# Windows:
+.\venv\Scripts\activate 
+# Mac/Linux:
+# source venv/bin/activate
+
+pip install -r requirements.txt
+python main.py
+```
+The AI Engine runs on `http://localhost:8000`.
+
+### 5. Frontend Setup
 ```bash
 cd frontend
 npm install
