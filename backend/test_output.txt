@@ -1,0 +1,208 @@
+
+> mytax-backend@1.0.0 test
+> jest --runInBand --forceExit
+
+[32minfo[39m: GET /api/health {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:12"}
+  console.log
+    ✅ Database connected successfully
+
+      at log (src/config/database.js:32:13)
+
+[32minfo[39m: GET /api/health {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:12"}
+  console.log
+    ✅ Database connected successfully
+
+      at log (src/config/database.js:32:13)
+
+[32minfo[39m: POST /api/auth/login {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:12"}
+FAIL tests/phase8.security_audit.test.js
+  Phase 8 - Security Headers & Rate Limits
+    √ Helmet middleware applies security headers (102 ms)
+    √ CORS is configured correctly (4 ms)
+    √ Global rate limiter is active (5 ms)
+    × Auth rate limiter is stricter than global (18 ms)
+
+  ● Phase 8 - Security Headers & Rate Limits › Auth rate limiter is stricter than global
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 50
+    Received:    500
+
+    [0m [90m 41 |[39m     [36mconst[39m limit [33m=[39m res[33m.[39mheaders[[32m'ratelimit-limit'[39m] [33m||[39m res[33m.[39mheaders[[32m'x-ratelimit-limit'[39m][33m;[39m
+     [90m 42 |[39m     [36mif[39m (limit) {
+    [31m[1m>[22m[39m[90m 43 |[39m       expect(parseInt(limit))[33m.[39mtoBeLessThanOrEqual([35m50[39m)[33m;[39m
+     [90m    |[39m                               [31m[1m^[22m[39m
+     [90m 44 |[39m     } [36melse[39m {
+     [90m 45 |[39m       expect(res[33m.[39mstatusCode)[33m.[39mtoBeDefined()[33m;[39m
+     [90m 46 |[39m     }[0m
+
+      at Object.toBeLessThanOrEqual (tests/phase8.security_audit.test.js:43:31)
+
+[32minfo[39m: POST /api/auth/register {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:12"}
+[32minfo[39m: GET /api/accounts {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:12"}
+[32minfo[39m: GET /api/health {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:12"}
+  console.log
+    ✅ Database connected successfully
+
+      at log (src/config/database.js:32:13)
+
+[32minfo[39m: POST /api/auth/register {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:12"}
+[32minfo[39m: POST /api/auth/register {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:13"}
+[32minfo[39m: POST /api/auth/login {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:13"}
+[32minfo[39m: POST /api/auth/login {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:13"}
+[32minfo[39m: GET /api/accounts {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:13"}
+[32minfo[39m: GET /api/companies/me {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:13"}
+[32minfo[39m: GET /api/accounts {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:13"}
+[32minfo[39m: POST /api/transactions {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:13"}
+[32minfo[39m: POST /api/transactions {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:13"}
+[32minfo[39m: GET /api/reports/trial-balance {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:13"}
+[32minfo[39m: GET /api/reports/profit-loss {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:13"}
+[32minfo[39m: GET /api/reports/balance-sheet {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:13"}
+[32minfo[39m: DELETE /api/transactions/0698fe10-713f-41c8-8394-bb10529f3f51 {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:13"}
+[32minfo[39m: POST /api/tax/compute {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:13"}
+[32minfo[39m: GET /api/tax/computation/2024 {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:13"}
+PASS tests/phase2_3.accounting_tax.test.js
+  Phase 1 & 2 - Auth & Company
+    √ Health check passes (5 ms)
+    √ Cannot register with duplicate email (280 ms)
+    √ Login with correct credentials returns token (290 ms)
+    √ Login with wrong password returns 401 (270 ms)
+    √ Protected route requires token (4 ms)
+    √ GET /api/companies/me returns company data (7 ms)
+    √ Registration seeded default Chart of Accounts (7 ms)
+  Phase 2 - Double-Entry Bookkeeping
+    √ Valid double-entry transaction is posted (Dr Cash, Cr Revenue) (14 ms)
+    √ Invalid double-entry is rejected (debits ≠ credits) (5 ms)
+    √ Trial Balance is balanced after posting (7 ms)
+    √ P&L report shows posted revenue (6 ms)
+    √ Balance Sheet report returns asset/liability/equity structure (6 ms)
+    √ Transaction can be voided (not deleted) (6 ms)
+  Phase 3 - Tax Engine (Unit Tests)
+    CIT - Corporate Income Tax
+      √ SME: RM100k chargeable income → 15% = RM15,000
+      √ SME: RM150k chargeable income → 15% = RM22,500 (1 ms)
+      √ SME: RM500k chargeable income → 15% on 150k + 17% on 350k = RM82,000
+      √ SME: RM700k chargeable income → tiered 3 bands
+      √ Non-SME: RM500k chargeable income → flat 24% = RM120,000 (1 ms)
+      √ Part of large group → flat 24% even if paid-up ≤ RM2.5M
+      √ Zero chargeable income → zero tax
+    SST - Sales & Service Tax
+      √ Service tax 8% on RM10,000 → RM800 tax, RM10,800 total (1 ms)
+      √ Sales tax 10% on RM5,000 → RM500 tax
+      √ Zero-rated SST → no tax
+    Withholding Tax
+      √ Royalty WHT 10% on RM50,000 (1 ms)
+      √ Interest WHT 15% on RM20,000
+      √ Dividends → 0% WHT (single-tier)
+    Capital Allowance
+      √ Plant & Machinery Year 1: IA 20% + AA 20% = 40% of cost (1 ms)
+      √ Plant & Machinery Year 2: IA = 0, only AA
+      √ Computer ACA: 100% write-off in year 1 (1 ms)
+    Full Tax Computation API
+      √ POST /api/tax/compute runs and stores result (9 ms)
+      √ GET /api/tax/computation/2024 retrieves stored computation (5 ms)
+
+[32minfo[39m: POST /api/auth/register {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:14"}
+[32minfo[39m: POST /api/employees {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:14"}
+[32minfo[39m: POST /api/payroll/preview {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:14"}
+[32minfo[39m: POST /api/payroll/run {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:14"}
+[32minfo[39m: POST /api/payroll/run {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:14"}
+[32minfo[39m: GET /api/payroll/runs/df7111f1-7b62-469b-8b77-0dbd6ad51514 {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:14"}
+[32minfo[39m: PUT /api/payroll/runs/df7111f1-7b62-469b-8b77-0dbd6ad51514/approve {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:14"}
+[32minfo[39m: POST /api/customers {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:14"}
+[32minfo[39m: POST /api/invoices {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:14"}
+[32minfo[39m: GET /api/invoices/d75219f8-aa73-43a7-8c78-7ada67b03ae5 {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:14"}
+[32minfo[39m: POST /api/einvoices/submit/d75219f8-aa73-43a7-8c78-7ada67b03ae5 {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:14"}
+[32minfo[39m: GET /api/einvoices/status/UUID-1774220774737-5x7pd1mxjh {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:14"}
+[32minfo[39m: POST /api/einvoices/submit/d75219f8-aa73-43a7-8c78-7ada67b03ae5 {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:14"}
+[32minfo[39m: PUT /api/invoices/d75219f8-aa73-43a7-8c78-7ada67b03ae5/status {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:14"}
+[32minfo[39m: POST /api/ai/categorize {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:14"}
+[32minfo[39m: POST /api/ai/categorize {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:14"}
+[32minfo[39m: POST /api/ai/optimize {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:14"}
+PASS tests/phase4_5.payroll_invoice.test.js
+  Phase 4 - Payroll Service (Unit Tests)
+    EPF Calculation
+      √ Employee RM5000 salary: employee 11% = RM550, employer 13% = RM650 (1 ms)
+      √ Employee RM6000 salary (above 5k): employer rate drops to 12%
+      √ Senior employee (age 60+): employee 5.5%, employer 4% (1 ms)
+      √ Foreign worker: EPF = 0
+    SOCSO Calculation
+      √ Employee RM4000 salary: employee 0.5% = RM20, employer 1.75% = RM70
+      √ Salary above RM4000 is capped at RM4000 for SOCSO (1 ms)
+      √ Senior (60+): employee SOCSO = 0, employer 1.25%
+    EIS Calculation
+      √ Employee RM3000 salary: employee 0.2% = RM6, employer 0.2% = RM6
+      √ EIS capped at RM4000 insurable salary
+      √ Employee age 57+ exempt from EIS
+    PCB Calculation
+      √ Low income RM800/month: no PCB (annual taxable income in 0% band)
+      √ Income RM8000/month, single: PCB is positive
+      √ Married with 2 children reduces PCB vs single
+    Full Payroll Calculation
+      √ RM5000 basic salary full calculation produces correct net (1 ms)
+      √ Muslim employee gets Zakat calculated
+  Phase 4 - Payroll API
+    √ Create employee (7 ms)
+    √ Preview payroll for one employee (5 ms)
+    √ Run payroll for March 2024 (12 ms)
+    √ Cannot run payroll for same month twice (6 ms)
+    √ Get payroll run with items (6 ms)
+    √ Approve payroll run (4 ms)
+  Phase 5 - Invoices & e-Invoice
+    √ Create customer (6 ms)
+    √ Create invoice with SST calculation (10 ms)
+    √ Fetch invoice with line items (6 ms)
+    √ Submit e-Invoice to mock LHDN (15 ms)
+    √ Cannot submit same invoice twice (6 ms)
+    √ Update invoice status to paid (5 ms)
+  AI Categorization & Optimization (Rule-based fallback)
+    √ Categorizes "office rent payment" as rent/expense (57 ms)
+    √ Categorizes "purchase laptop" as computers/asset (8 ms)
+    √ Tax optimization returns suggestions (14 ms)
+
+[32minfo[39m: POST /api/auth/register {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:15"}
+[32minfo[39m: GET /api/export/transactions {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:15"}
+[32minfo[39m: POST /api/export/cp204-wizard {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:15"}
+PASS tests/phase7.export_forms.test.js
+  Phase 7 - Exports
+    √ GET /api/export/transactions returns CSV (8 ms)
+    √ POST /api/export/cp204-wizard generates 12 instalments (6 ms)
+
+[32minfo[39m: POST /api/auth/register {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:15"}
+[32minfo[39m: POST /api/cgt {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:16"}
+[32minfo[39m: POST /api/cgt {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:16"}
+[32minfo[39m: GET /api/cgt/summary/2026 {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:16"}
+[32minfo[39m: GET /api/cgt/meta/audit-log {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:16"}
+PASS tests/phase6.cgt_compliance.test.js
+  Phase 6 - CGT Disposals
+    √ Calculate and record unlisted share disposal (10% CGT) (9 ms)
+    √ Listed shares are exempt from CGT (7 ms)
+    √ Can fetch CGT disposals summary (7 ms)
+  Phase 6 - Immutable Audit Log
+    √ Audit log recorded the CGT creation (5 ms)
+
+  console.log
+    ✅ Database connected successfully
+
+      at log (src/config/database.js:32:13)
+
+[32minfo[39m: GET /api/health {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:16"}
+  console.log
+    ✅ Database connected successfully
+
+      at log (src/config/database.js:32:13)
+
+[32minfo[39m: GET /api/nonexistent {"ip":"::ffff:127.0.0.1","service":"mytax-backend","timestamp":"2026-03-23 07:06:16"}
+PASS tests/phase1.health.test.js
+  Phase 1 - Foundation
+    √ Database connection is working (134 ms)
+    √ GET /api/health returns 200 with connected status (6 ms)
+    √ Unknown routes return 404 (3 ms)
+
+Test Suites: 1 failed, 5 passed, 6 total
+Tests:       1 failed, 73 passed, 74 total
+Snapshots:   0 total
+Time:        5.954 s, estimated 7 s
+Ran all test suites.
+Force exiting Jest: Have you considered using `--detectOpenHandles` to detect async operations that kept running after all tests finished?
