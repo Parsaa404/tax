@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { reportAPI, deadlineAPI, taxAPI } from '../api/services';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
-import { TrendingUp, TrendingDown, DollarSign, FileText, Users, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
+import { TrendingUp, TrendingDown, DollarSign, FileText, Users, AlertTriangle, CheckCircle, Clock, Info } from 'lucide-react';
+import Joyride, { STATUS } from 'react-joyride';
 
 const fmt = (n) => `RM ${Number(n || 0).toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 const fmtNum = (n) => Number(n || 0).toLocaleString('en-MY');
@@ -14,7 +15,38 @@ export default function Dashboard() {
   const [taxComp, setTaxComp] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Joyride state
+  const [runTour, setRunTour] = useState(false);
+  const [tourSteps] = useState([
+    {
+      target: '.page-header h1',
+      content: 'Welcome to MYTax! This dashboard gives you a complete overview of your business tax and finances in real-time.',
+      disableBeacon: true,
+    },
+    {
+      target: '.kpi-grid',
+      content: 'Here you can see your real-time Revenue, Expenses, Net Profit, and most importantly: your automatically computed pending Corporate Tax based on Malaysian (YA 2026) laws.',
+    },
+    {
+      target: '.tour-step-charts',
+      content: 'This chart breaks down your cash flow visually over the months of the year.',
+    },
+    {
+      target: '.tour-step-tax-summary',
+      content: 'This is where the magic happens! MYTax continuously aggregates your Capital Allowances, Zakat, and CP204 payments to estimate exactly what you owe LHDN.',
+    },
+    {
+      target: '.tour-step-deadlines',
+      content: 'Never miss a filing deadline again. Your Form C and CP204 due dates will automatically appear here based on your financial year-end.',
+    }
+  ]);
+
   useEffect(() => {
+    // Check if user has already seen the tour
+    if (localStorage.getItem('dashboard_tour_seen') !== 'true') {
+      setTimeout(() => setRunTour(true), 500); // Small delay to let data load
+    }
+
     const year = new Date().getFullYear();
     Promise.all([
       reportAPI.dashboard().catch(() => ({ data: { data: null } })),
@@ -41,14 +73,42 @@ export default function Dashboard() {
 
   if (loading) return <div className="spinner-full"><div className="loading" style={{ width: 32, height: 32 }} /></div>;
 
+  const handleJoyrideCallback = (data) => {
+    const { status } = data;
+    if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status)) {
+      setRunTour(false);
+      localStorage.setItem('dashboard_tour_seen', 'true');
+    }
+  };
+
   const netProfit = revenue - expenses;
   const taxPayable = parseFloat(taxComp?.balance_tax_payable || 0);
 
   return (
     <div>
-      <div className="page-header">
-        <h1>Financial Overview</h1>
-        <p>Year of Assessment {new Date().getFullYear()} · {new Date().toLocaleDateString('en-MY', { weekday:'long', day:'numeric', month:'long', year:'numeric' })}</p>
+      <Joyride
+        steps={tourSteps}
+        run={runTour}
+        continuous
+        showSkipButton
+        showProgress
+        callback={handleJoyrideCallback}
+        styles={{
+          options: {
+            primaryColor: '#2ea043',
+            zIndex: 1000,
+          }
+        }}
+      />
+      <div className="page-header flex-between">
+        <div>
+          <h1>Financial Overview</h1>
+          <p>Year of Assessment {new Date().getFullYear()} · {new Date().toLocaleDateString('en-MY', { weekday:'long', day:'numeric', month:'long', year:'numeric' })}</p>
+        </div>
+        <button className="btn btn-secondary" onClick={() => { setRunTour(true); localStorage.removeItem('dashboard_tour_seen'); }}>
+          <Info size={16} style={{ marginRight: 6 }} />
+          Guide
+        </button>
       </div>
 
       {/* KPI Cards */}
@@ -83,7 +143,7 @@ export default function Dashboard() {
 
       {/* Charts Row */}
       <div className="grid-65-35 mb-6">
-        <div className="card">
+        <div className="card tour-step-charts">
           <div className="card-header">
             <h3>Revenue vs Expenses</h3>
             <span className="chip chip-blue">YTD {new Date().getFullYear()}</span>
@@ -121,7 +181,7 @@ export default function Dashboard() {
         </div>
 
         {/* Tax Summary */}
-        <div className="card">
+        <div className="card tour-step-tax-summary">
           <div className="card-header">
             <h3>Tax Summary</h3>
             {taxComp ? <span className="chip chip-green">Computed</span> : <span className="chip chip-gray">Pending</span>}
@@ -158,7 +218,7 @@ export default function Dashboard() {
       </div>
 
       {/* Deadlines */}
-      <div className="card">
+      <div className="card tour-step-deadlines">
         <div className="card-header">
           <h3>Upcoming Tax Deadlines</h3>
           <a href="/deadlines" className="btn btn-ghost btn-sm">View all</a>

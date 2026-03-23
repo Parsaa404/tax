@@ -127,8 +127,8 @@ router.get('/balance-sheet', async (req, res) => {
   }
 });
 
-// GET /api/reports/dashboard-summary
-router.get('/dashboard-summary', async (req, res) => {
+// GET /api/reports/dashboard
+router.get(['/dashboard', '/dashboard-summary'], async (req, res) => {
   try {
     const currentYear = new Date().getFullYear();
     const fromDate = `${currentYear}-01-01`;
