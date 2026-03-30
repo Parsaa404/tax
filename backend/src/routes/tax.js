@@ -81,7 +81,7 @@ router.get('/computation/:year', async (req, res) => {
     const computation = await db('tax_computations')
       .where({ company_id: req.user.companyId, year_of_assessment: req.params.year })
       .first();
-    if (!computation) return res.status(404).json({ error: 'No computation found for this year' });
+    if (!computation) return res.json({ data: null, message: 'No computation found for this year' });
     res.json({ data: computation });
   } catch (err) {
     res.status(500).json({ error: err.message });

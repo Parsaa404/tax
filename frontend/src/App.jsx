@@ -8,6 +8,7 @@ import Accounts from './pages/Accounts';
 import Transactions from './pages/Transactions';
 import Tax from './pages/Tax';
 import Payroll from './pages/Payroll';
+import Customers from './pages/Customers';
 import Invoices from './pages/Invoices';
 import Reports from './pages/Reports';
 import Expenses from './pages/Expenses';
@@ -38,6 +39,7 @@ function AppRoutes() {
         <Route path="transactions" element={<Transactions />} />
         <Route path="tax"          element={<Tax />} />
         <Route path="payroll"      element={<Payroll />} />
+        <Route path="customers"    element={<Customers />} />
         <Route path="invoices"     element={<Invoices />} />
         <Route path="expenses"     element={<Expenses />} />
         <Route path="assets"       element={<Assets />} />

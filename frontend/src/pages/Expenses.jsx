@@ -23,7 +23,9 @@ export default function Expenses() {
   const handleCreate = async (e) => {
     e.preventDefault(); setError('');
     try {
-      await expenseAPI.create({ ...form, amount: parseFloat(form.amount) });
+      const payload = { ...form, amount: parseFloat(form.amount) };
+      if (!payload.account_id) payload.account_id = null;
+      await expenseAPI.create(payload);
       setShowModal(false); setForm({ expense_date: new Date().toISOString().slice(0,10), description:'', amount:'', category:'operating', vendor_name:'', account_id:'', is_tax_deductible: true, receipt_number:'' });
       load();
     } catch(err) { setError(err.response?.data?.error || 'Failed to record expense'); }

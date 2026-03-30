@@ -24,8 +24,9 @@ const navItems = [
     { to: '/payroll', label: 'Payroll',     icon: Users },
   ]},
   { section: 'Billing', items: [
-    { to: '/invoices', label: 'Invoices',  icon: FileText },
-    { to: '/reports',  label: 'Reports',   icon: BarChart3 },
+    { to: '/customers', label: 'Customers', icon: Users },
+    { to: '/invoices',  label: 'Invoices',  icon: FileText },
+    { to: '/reports',   label: 'Reports',   icon: BarChart3 },
   ]},
 ];
 
@@ -39,7 +40,7 @@ export default function Layout() {
   const pageTitle = (pathname) => {
     const map = {
       '/': 'Dashboard', '/accounts': 'Chart of Accounts', '/transactions': 'Transactions',
-      '/tax': 'Tax Engine', '/payroll': 'Payroll', '/invoices': 'Invoices',
+      '/tax': 'Tax Engine', '/payroll': 'Payroll', '/customers': 'Customers', '/invoices': 'Invoices',
       '/expenses': 'Expenses', '/assets': 'Fixed Assets', '/reports': 'Reports',
       '/ai': 'AI Insights', '/deadlines': 'Tax Deadlines', '/settings': 'Settings', '/help': 'Help Center',
     };

@@ -35,7 +35,9 @@ export default function Invoices() {
   const handleCreate = async (e) => {
     e.preventDefault(); setError('');
     try {
-      await invoiceAPI.create({ ...form, items: form.items.map(it => ({ ...it, quantity: parseFloat(it.quantity), unit_price: parseFloat(it.unit_price) })) });
+      const payload = { ...form, items: form.items.map(it => ({ ...it, quantity: parseFloat(it.quantity), unit_price: parseFloat(it.unit_price) })) };
+      if (!payload.due_date) payload.due_date = null;
+      await invoiceAPI.create(payload);
       setShowCreate(false);
       setForm({ customer_id:'', invoice_number:`INV-${Date.now()}`, issue_date: new Date().toISOString().slice(0,10), due_date:'', tax_type:'SST', items:[{ description:'', quantity:1, unit_price:'' }] });
       load();

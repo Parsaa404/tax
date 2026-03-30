@@ -33,7 +33,15 @@ export default function Transactions() {
     e.preventDefault(); setError('');
     try {
       const lines = form.journal_lines.map(l => ({ account_id:l.account_id, debit:parseFloat(l.debit)||0, credit:parseFloat(l.credit)||0, description:l.description }));
-      await transactionAPI.create({ ...form, journal_lines: lines });
+      const payload = { ...form, journal_lines: lines };
+      
+      // Handle the free-text reference by appending it to description to avoid Joi schema rejection
+      if (payload.reference) {
+         payload.description = `${payload.description} [Ref: ${payload.reference}]`;
+      }
+      delete payload.reference;
+
+      await transactionAPI.create(payload);
       setShowModal(false); load();
     } catch(err) { setError(err.response?.data?.error || 'Failed to post transaction'); }
   };

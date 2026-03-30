@@ -17,14 +17,19 @@ export default function Accounts() {
 
   const handleCreate = async (e) => {
     e.preventDefault(); setError('');
-    try { await accountAPI.create(form); setShowModal(false); setForm({ account_code:'', account_name:'', account_type:'asset', parent_id:'', description:'' }); load(); }
+    try { 
+      const payload = { ...form };
+      if (!payload.parent_id) payload.parent_id = null;
+      await accountAPI.create(payload); 
+      setShowModal(false); setForm({ account_code:'', account_name:'', account_type:'asset', parent_id:'', description:'' }); load(); 
+    }
     catch (err) { setError(err.response?.data?.error || 'Failed to create account'); }
   };
 
   // Group by type
   const grouped = accounts.reduce((g, a) => { (g[a.account_type] = g[a.account_type] || []).push(a); return g; }, {});
-  const types = ['asset','liability','equity','revenue','expense','cogs'];
-  const typeLabels = { asset:'Assets', liability:'Liabilities', equity:'Equity', revenue:'Revenue', expense:'Expenses', cogs:'Cost of Goods Sold' };
+  const types = ['asset','liability','equity','revenue','expense'];
+  const typeLabels = { asset:'Assets', liability:'Liabilities', equity:'Equity', revenue:'Revenue', expense:'Expenses' };
 
   return (
     <div>
